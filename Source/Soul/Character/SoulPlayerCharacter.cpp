@@ -4,6 +4,7 @@
 #include "SoulPlayerCharacter.h"
 
 #include "Camera/CameraComponent.h"
+#include "Components/WidgetComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 
@@ -29,6 +30,8 @@ ASoulPlayerCharacter::ASoulPlayerCharacter(const FObjectInitializer& ObjectIniti
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>("FollowCamera");
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	FollowCamera->bUsePawnControlRotation = false; // 스프링 암이 캐릭터 회전을 따라가므로 카메라는 꺼준다.
+	
+	
 }
 
 void ASoulPlayerCharacter::BeginPlay()

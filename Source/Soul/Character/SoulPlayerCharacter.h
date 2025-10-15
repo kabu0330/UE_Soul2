@@ -22,14 +22,16 @@ public:
 
 	FORCEINLINE USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	FORCEINLINE float GetTargetArmLength() const { return TargetArmLength; }
+	
 protected:
 	virtual void BeginPlay() override;
 
 protected: // Components
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera")
+	/** 카메라 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components|Camera")
 	TObjectPtr<USpringArmComponent> CameraBoom;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components|Camera")
 	TObjectPtr<UCameraComponent> FollowCamera;
 
 protected: 

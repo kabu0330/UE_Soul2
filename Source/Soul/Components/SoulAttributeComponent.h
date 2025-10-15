@@ -7,7 +7,7 @@
 #include "Soul/SoulDefine.h"
 #include "SoulAttributeComponent.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnAttributeChanged, EAttributeType, Type, float, Value);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnAttributeChanged, EAttributeType, Type, float, Ratio);
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class SOUL_API USoulAttributeComponent : public UActorComponent
@@ -32,6 +32,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Attribute|Stamina")
 	float StaminaRate = 0.2f;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Attribute|Stamina")
+	float StaminaRegenRate = 0.1f;
 
 	FTimerHandle StaminaRegenTimer;
 

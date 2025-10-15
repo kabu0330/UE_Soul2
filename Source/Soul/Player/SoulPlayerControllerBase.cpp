@@ -119,7 +119,8 @@ void ASoulPlayerControllerBase::Zoom(const FInputActionValue& Value)
 		{
 			const float ZoomValue = Value.Get<float>() * 10.f;
 			const float Length = SoulCharacter->GetTargetArmLength();
-			CameraBoom->TargetArmLength = FMath::Clamp(CameraBoom->TargetArmLength + ZoomValue, Length - 300.f, Length + 100.f);
+			CameraBoom->TargetArmLength = FMath::Clamp(
+				CameraBoom->TargetArmLength + ZoomValue, Length - 300.f, Length + 100.f);
 		}
 	}
 		

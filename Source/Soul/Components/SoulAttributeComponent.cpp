@@ -45,7 +45,7 @@ void USoulAttributeComponent::ToggleStaminaRegeneration(bool bEnabled, float Sta
 		if (false == IsActiveTimer)
 		{
 			GetWorld()->GetTimerManager().SetTimer(
-				StaminaRegenTimer, this, &ThisClass::RegenStaminaHandler, StartDelay, true);
+				StaminaRegenTimer, this, &ThisClass::RegenStaminaHandler, StaminaRegenRate, true, StartDelay);
 		}
 	}
 	else
@@ -72,12 +72,12 @@ void USoulAttributeComponent::BroadCastAttributeChanged(EAttributeType Type) con
 {
 	if (false == OnAttributeChanged.IsBound()) return;
 	
-	float Value = 0.f;
+	float Ratio = 0.f;
 	
 	switch (Type)
 	{
 	case EAttributeType::Stamina:
-		Value = BaseStamina;
+		Ratio = BaseStamina / MaxStamina;
 		break;
 
 	case EAttributeType::Health:
@@ -88,6 +88,6 @@ void USoulAttributeComponent::BroadCastAttributeChanged(EAttributeType Type) con
 		break;
 	}
 
-	OnAttributeChanged.Broadcast(Type, Value);
+	OnAttributeChanged.Broadcast(Type, Ratio);
 }
 
