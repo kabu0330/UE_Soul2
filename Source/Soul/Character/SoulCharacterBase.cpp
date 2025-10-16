@@ -3,16 +3,19 @@
 
 #include "SoulCharacterBase.h"
 
-#include "Soul/Components/SoulAttributeComponent.h"
+#include "Soul/Components/AttributeComponent.h"
+#include "Soul/Components/CombatComponent.h"
 #include "Soul/Components/SoulCharacterMovementComponent.h"
+#include "Soul/Components/StateComponent.h"
 
 ASoulCharacterBase::ASoulCharacterBase(const FObjectInitializer& ObjectInitializer)
 	:Super(ObjectInitializer.SetDefaultSubobjectClass<USoulCharacterMovementComponent>(ACharacter::CharacterMovementComponentName))
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	AttributeComponent = CreateDefaultSubobject<USoulAttributeComponent>("AttributeComponent");
-	
+	AttributeComponent = CreateDefaultSubobject<UAttributeComponent>("AttributeComponent");
+	StateComponent = CreateDefaultSubobject<UStateComponent>("StateComponent");
+	CombatComponent = CreateDefaultSubobject<UCombatComponent>("CombatComponent");
 }
 
 void ASoulCharacterBase::BeginPlay()

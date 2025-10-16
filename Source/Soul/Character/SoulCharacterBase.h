@@ -6,7 +6,11 @@
 #include "GameFramework/Character.h"
 #include "SoulCharacterBase.generated.h"
 
-class USoulAttributeComponent;
+class UCombatComponent;
+class UStateComponent;
+class UAttributeComponent;
+
+
 
 /** 캐릭터와 몬스터가 공통으로 가지고 있는 컴포넌트
  * 
@@ -21,13 +25,21 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	FORCEINLINE USoulAttributeComponent* GetAttributeComponent() const {return AttributeComponent; }
-
+	FORCEINLINE UAttributeComponent* GetAttributeComponent() const {return AttributeComponent; }
+	FORCEINLINE UStateComponent* GetStateComponent() const {return StateComponent; }
+	FORCEINLINE UCombatComponent* GetCombatComponent() const {return CombatComponent; }
+	
 protected:
 	virtual void BeginPlay() override;
 
-	UPROPERTY(EditAnywhere, Category = "Components|Attribute")
-	TObjectPtr<USoulAttributeComponent> AttributeComponent;
+	UPROPERTY(EditAnywhere, Category = "Components")
+	TObjectPtr<UAttributeComponent> AttributeComponent;
+
+	UPROPERTY(EditAnywhere, Category = "Components")
+	TObjectPtr<UStateComponent> StateComponent;
+
+	UPROPERTY(EditAnywhere, Category = "Components")
+	TObjectPtr<UCombatComponent> CombatComponent; 
 
 public:
 

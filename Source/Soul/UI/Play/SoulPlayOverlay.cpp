@@ -4,9 +4,11 @@
 #include "Soul/UI/Play/SoulPlayOverlay.h"
 
 #include "StatBarWidget.h"
+#include "StatusMessageWidget.h"
 #include "Soul/Soul.h"
 #include "Soul/Character/SoulCharacterBase.h"
-#include "Soul/Components/SoulAttributeComponent.h"
+#include "Soul/Character/SoulPlayerCharacter.h"
+#include "Soul/Components/AttributeComponent.h"
 
 
 void USoulPlayOverlay::NativeConstruct()
@@ -15,15 +17,17 @@ void USoulPlayOverlay::NativeConstruct()
 
 	if (APawn* OwningPawn = GetOwningPlayerPawn())
 	{
-		if (ASoulCharacterBase* SoulCharacter = Cast<ASoulCharacterBase>(OwningPawn))
+		if (ASoulPlayerCharacter* SoulCharacter = Cast<ASoulPlayerCharacter>(OwningPawn))
 		{
-			SoulCharacter->GetAttributeComponent()->OnAttributeChanged.AddDynamic(this, &USoulPlayOverlay::OnAttributeChanged);
+			SoulCharacter->GetAttributeComponent()->OnAttributeChanged.AddDynamic(this, &ThisClass::OnAttributeChanged);
 
 			// 바로 브로드캐스트하여 위젯에 게임 시작 직후의 상태를 위젯에 동기화
 			SoulCharacter->GetAttributeComponent()->BroadCastAttributeChanged(EAttributeType::Stamina);
+			
+			SoulCharacter->OnStateMessage.AddDynamic(this, &ThisClass::SetStatusMessage);
+			SoulCharacter->BroadcastStateMessage(TEXT(""));
 		}
 	}
-	
 }
 
 void USoulPlayOverlay::OnAttributeChanged(EAttributeType Type, float Ratio)
@@ -41,5 +45,13 @@ void USoulPlayOverlay::OnAttributeChanged(EAttributeType Type, float Ratio)
 		break;
 	case EAttributeType::Health:
 		break;
+	}
+}
+
+void USoulPlayOverlay::SetStatusMessage(const FString& Message)
+{
+	if (IsValid(StatusMessageWidget))
+	{
+		StatusMessageWidget->SetMessage(Message);
 	}
 }

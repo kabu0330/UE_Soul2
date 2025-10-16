@@ -37,17 +37,34 @@ protected:
 	TObjectPtr<UInputAction> JumpAction;
 
 	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite, Category = "EnhancedInput|InputAction")
-	TObjectPtr<UInputAction> SprintAction;
+	TObjectPtr<UInputAction> SprintAndRollingAction;
 
 	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite, Category = "EnhancedInput|InputAction")
 	TObjectPtr<UInputAction> ZoomAction;
 
+	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite, Category = "EnhancedInput|InputAction")
+	TObjectPtr<UInputAction> InteractAction;
+
+	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite, Category = "EnhancedInput|InputAction")
+	TObjectPtr<UInputAction> ToggleCombatModeAction;
+
 protected:
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
+	void Zoom(const FInputActionValue& Value);
+
+	/** 점프 */
 	void Jump();
 	void StopJumping();
+
+	/** 질주 */
 	void Sprint(); 
 	void StopSprinting();
-	void Zoom(const FInputActionValue& Value);
+
+	/** 구르기 */
+	void Rolling();
+
+	void Interact();
+	void ToggleCombatMode();
+	
 };

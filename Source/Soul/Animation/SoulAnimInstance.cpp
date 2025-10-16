@@ -6,6 +6,7 @@
 #include "KismetAnimationLibrary.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Soul/Character/SoulCharacterBase.h"
+#include "Soul/Components/StateComponent.h"
 
 USoulAnimInstance::USoulAnimInstance()
 {
@@ -40,3 +41,12 @@ void USoulAnimInstance::NativeUpdateAnimation(float DeltaSecond)
 	
 	
 }
+
+void USoulAnimInstance::AnimNotify_ResetMovementInput()
+{
+	if (ASoulCharacterBase* SoulCharacter = Cast<ASoulCharacterBase>(GetOwningActor()))
+	{
+		SoulCharacter->GetStateComponent()->ToggleMovementInput(true);
+	}
+}
+

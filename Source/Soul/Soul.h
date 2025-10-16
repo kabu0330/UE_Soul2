@@ -30,7 +30,7 @@ do { \
 UE_LOG(LogSoul, Log, TEXT(Format), ##__VA_ARGS__); \
 if (GEngine) \
 { \
-GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, \
+GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Cyan, \
 FString::Printf(TEXT(Format), ##__VA_ARGS__)); \
 } \
 } while(0)

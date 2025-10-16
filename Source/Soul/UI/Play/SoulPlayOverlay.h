@@ -7,6 +7,7 @@
 #include "Soul/SoulDefine.h"
 #include "SoulPlayOverlay.generated.h"
 
+class UStatusMessageWidget;
 class UStatBarWidget;
 /**
  * 
@@ -23,6 +24,14 @@ protected:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UStatBarWidget> StaminaStatBarWidget;
 
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UStatusMessageWidget> StatusMessageWidget;
+
 	UFUNCTION()
 	void OnAttributeChanged(EAttributeType Type, float Ratio);
+
+	UFUNCTION()
+	void SetStatusMessage(const FString& Message);
+
+	FTimerHandle ClearTextTimerHandle;
 };

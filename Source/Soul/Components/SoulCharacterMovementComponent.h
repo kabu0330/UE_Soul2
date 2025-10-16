@@ -8,7 +8,7 @@
 #include "SoulCharacterMovementComponent.generated.h"
 
 
-class USoulAttributeComponent;
+class UAttributeComponent;
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class SOUL_API USoulCharacterMovementComponent : public UCharacterMovementComponent
@@ -38,7 +38,7 @@ protected:
 	bool bSprinting = false;
 
 	UPROPERTY()
-	TObjectPtr<USoulAttributeComponent> AttributeComponent;
+	TObjectPtr<UAttributeComponent> AttributeComponent;
 
 public:
 	FORCEINLINE float GetBaseSpeed() const {return BaseSpeed; }

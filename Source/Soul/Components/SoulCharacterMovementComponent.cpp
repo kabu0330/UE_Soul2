@@ -3,9 +3,12 @@
 
 #include "SoulCharacterMovementComponent.h"
 
-#include "SoulAttributeComponent.h"
+#include "AttributeComponent.h"
+#include "StateComponent.h"
 #include "Soul/Soul.h"
+#include "Soul/SoulGameplayTag.h"
 #include "Soul/Character/SoulCharacterBase.h"
+#include "Soul/Character/SoulPlayerCharacter.h"
 
 
 class ASoulCharacterBase;
@@ -56,6 +59,13 @@ void USoulCharacterMovementComponent::Sprint()
 		AttributeComponent->DecreaseStamina(0.1f);
 		
 		bSprinting = true;
+
+		// 상태 태그 추가
+		ASoulPlayerCharacter* PlayerCharacter = Cast<ASoulPlayerCharacter>(GetOwner());
+		if (IsValid(PlayerCharacter))
+		{
+			PlayerCharacter->GetStateComponent()->AddGameplayTag(SoulGameplayTag::Character_State_Sprinting);
+		}
 	}
 	else
 	{
@@ -72,6 +82,13 @@ void USoulCharacterMovementComponent::StopSprinting()
 	AttributeComponent->ToggleStaminaRegeneration(true);
 	
 	bSprinting = false;
+
+	// 상태 태그 삭제
+	ASoulPlayerCharacter* PlayerCharacter = Cast<ASoulPlayerCharacter>(GetOwner());
+	if (IsValid(PlayerCharacter))
+	{
+		PlayerCharacter->GetStateComponent()->RemoveGameplayTag(SoulGameplayTag::Character_State_Sprinting);
+	}
 }
 
 bool USoulCharacterMovementComponent::IsMoving() const
