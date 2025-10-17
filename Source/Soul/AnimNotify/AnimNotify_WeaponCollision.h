@@ -9,7 +9,7 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(meta = (DisplayName = "WeaponCollision"))
 class SOUL_API UAnimNotify_WeaponCollision : public UAnimNotifyState
 {
 	GENERATED_BODY()

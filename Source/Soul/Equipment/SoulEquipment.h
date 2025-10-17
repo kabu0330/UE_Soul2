@@ -12,6 +12,15 @@ class SOUL_API ASoulEquipment : public AActor
 	GENERATED_BODY()
 
 public:
+	/** 에디터에서 메시 직접 설정 */
+	UPROPERTY(EditAnywhere, Category = "Equipment")
+	TObjectPtr<UStaticMesh> MeshAsset;
+
+protected:
+	UPROPERTY() 
+	TObjectPtr<UStaticMeshComponent> MeshComponent;
+
+public:
 	ASoulEquipment();
 	virtual void Tick(float DeltaTime) override;
 	virtual void OnConstruction(const FTransform& Transform) override;
@@ -21,14 +30,8 @@ public:
 	virtual void UnequipItem() {};
 	virtual void AttachToOwner(FName SocketName);
 
-	UPROPERTY(EditAnywhere, Category = "Equipment")
-	TObjectPtr<UStaticMesh> MeshAsset;
-
 protected:
 	virtual void BeginPlay() override;
 	
-	UPROPERTY()
-	TObjectPtr<UStaticMeshComponent> MeshComponent;
-
 
 };

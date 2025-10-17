@@ -3,6 +3,7 @@
 
 #include "SoulWeapon.h"
 
+#include "Kismet/GameplayStatics.h"
 #include "Soul/Soul.h"
 #include "Soul/Character/SoulPlayerCharacter.h"
 #include "Soul/Components/CombatComponent.h"
@@ -15,6 +16,7 @@ ASoulWeapon::ASoulWeapon()
 {
 	PrimaryActorTick.bCanEverTick = true;
 	WeaponCollisionComponent = CreateDefaultSubobject<UWeaponCollisionComponent>("WeaponCollisionComponent");
+	WeaponCollisionComponent->OnHitActor.AddUObject(this, &ThisClass::OnHitActor); // 델리게이트
 }
 
 void ASoulWeapon::BeginPlay()
@@ -26,6 +28,45 @@ void ASoulWeapon::BeginPlay()
 void ASoulWeapon::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+}
+
+float ASoulWeapon::GetAttackDamage() const
+{
+	check(CombatComponent);
+	ensure(WeaponStatDataAsset);
+
+	const FGameplayTag LastAttackType = CombatComponent->GetLastAttackType();
+	
+	if (WeaponStatDataAsset->DamageMultiplierMap.Contains(LastAttackType))
+	{
+		const float Multiplier = WeaponStatDataAsset->DamageMultiplierMap[LastAttackType];
+		return WeaponStatDataAsset->BaseDamage * Multiplier;
+	}
+	else
+	{
+		LOG_WARNING("무기 스탯 데이터 에셋에 데미지 배율이 등록되지 않은 공격입니다: %s, %s", *this->GetName(), *LastAttackType.ToString());
+	}
+	
+	return WeaponStatDataAsset->BaseDamage;
+}
+
+void ASoulWeapon::OnHitActor(const FHitResult& Hit)
+{
+	AActor* TargetActor = Hit.GetActor();
+	
+	const FVector DamageDirection = GetOwner()->GetActorForwardVector();
+	const float AttackDamage = GetAttackDamage();
+	LOG_WARNING("Hit Actor: %s, Damage : %f", *TargetActor->GetName(), AttackDamage);
+
+	UGameplayStatics::ApplyPointDamage(
+		TargetActor,
+		AttackDamage,
+		DamageDirection,  // 피해가 적용된 방향, 피격 당한 액터가 넉백되거나 피격 효과를 출력할 때 유용
+		Hit,
+		GetOwner()->GetInstigatorController(), // 피해를 일으킨 컨트롤러, 어그로 관리나 점수 처리 등 판단
+		this, // 피해를 일으킨 액터, 주로 무기나 발사체
+		nullptr // 피해 유형을 정의하는 클래스, 화염 냉기 관통 등 속성 데미지
+		);
 }
 
 void ASoulWeapon::EquipItem()
@@ -73,26 +114,6 @@ float ASoulWeapon::GetStaminaCost(const FGameplayTag& InTag) const
 	return 0.f;
 }
 
-float ASoulWeapon::GetAttackDamage() const
-{
-	check(CombatComponent);
-	ensure(WeaponStatDataAsset);
-
-	const FGameplayTag LastAttackType = CombatComponent->GetLastAttackType();
-	
-	if (WeaponStatDataAsset->DamageMultiplierMap.Contains(LastAttackType))
-	{
-		const float Multiplier = WeaponStatDataAsset->DamageMultiplierMap[LastAttackType];
-		return WeaponStatDataAsset->BaseDamage * Multiplier;
-	}
-	else
-	{
-		LOG_WARNING("무기 스탯 데이터 에셋에 데미지 배율이 등록되지 않은 공격입니다: %s, %s", *this->GetName(), *LastAttackType.ToString());
-	}
-	
-	return WeaponStatDataAsset->BaseDamage;
-}
-
 UAnimMontage* ASoulWeapon::GetMontageForTag(const FGameplayTag& InTag, const int32 Index) const
 {
 	if (IsValid(MontageActionData))
@@ -104,5 +125,13 @@ UAnimMontage* ASoulWeapon::GetMontageForTag(const FGameplayTag& InTag, const int
 		LOG_ERROR("무기에 몽타주 액션 데이터 에셋이 등록되지 않았습니다: %s", *this->GetName());
 	}
 	return nullptr;
+}
+
+void ASoulWeapon::ActivateCollision(EWeaponCollisionType InCollisionType)
+{
+}
+
+void ASoulWeapon::DeactivateCollision(EWeaponCollisionType InCollisionType)
+{
 }
 

@@ -3,6 +3,7 @@
 
 #include "SoulCharacterBase.h"
 
+#include "Components/CapsuleComponent.h"
 #include "Soul/SoulGameplayTag.h"
 #include "Soul/Components/AttributeComponent.h"
 #include "Soul/Components/CombatComponent.h"
@@ -19,6 +20,8 @@ ASoulCharacterBase::ASoulCharacterBase(const FObjectInitializer& ObjectInitializ
 	AttributeComponent = CreateDefaultSubobject<UAttributeComponent>("AttributeComponent");
 	StateComponent = CreateDefaultSubobject<UStateComponent>("StateComponent");
 	CombatComponent = CreateDefaultSubobject<UCombatComponent>("CombatComponent");
+
+	AttributeComponent->OnDeath.AddUObject(this, &ThisClass::OnDeath);
 
 }
 
@@ -127,6 +130,22 @@ void ASoulCharacterBase::AttackFinished()
 	{
 		StateComponent->ToggleMovementInput(true); // 여기서 State가 Clear 된다.
 		StateComponent->RemoveGameplayTag(SoulGameplayTag::Character_State_Attacking);
+	}
+}
+
+void ASoulCharacterBase::OnDeath()
+{
+	if (UCapsuleComponent* CapsuleComp = GetCapsuleComponent())
+	{
+		CapsuleComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
+
+	if (USkeletalMeshComponent* MeshComp = GetMesh())
+	{
+		// 물리 시뮬레이션에 기반한 사망 애니메이션 출력, 정상동작 안할경우 피직스 에셋의 지원여부 체크
+		MeshComp->SetCollisionProfileName("Ragdoll");
+		MeshComp->SetSimulatePhysics(true);
+		MeshComp->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
 	}
 }
 

@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
 #include "SoulEquipment.h"
+#include "Soul/SoulDefine.h"
 #include "SoulWeapon.generated.h"
 
 class UWeaponStatData;
@@ -17,26 +18,7 @@ class SOUL_API ASoulWeapon : public ASoulEquipment
 {
 	GENERATED_BODY()
 
-public:
-	ASoulWeapon();
-	virtual void Tick(float DeltaTime) override;
-	
-	virtual void EquipItem() override;
-	virtual void UnequipItem() override;
-
-	FORCEINLINE FName GetEquipSocketName() const { return EquipSocketName; }
-	FORCEINLINE FName GetUnequipSocketName() const { return UnequipSocketName; }
-	
-	FORCEINLINE UWeaponCollisionComponent* GetCollision() const {return WeaponCollisionComponent;}
-	
-	float GetStaminaCost(const FGameplayTag& InTag) const;
-	float GetAttackDamage() const;
-
-	UAnimMontage* GetMontageForTag(const FGameplayTag& InTag, const int32 Index = 0) const;
-
 protected:
-	virtual void BeginPlay() override;
-
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon|SocketName")
 	FName EquipSocketName = "SwordEquipWeapon";
 
@@ -57,9 +39,34 @@ protected:
 	TObjectPtr<UMontageActionData> MontageActionData;
 
 	/** Combat Type */
-	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Equipment")
-	// ECombatType CombatType = ECombatType::SwordShield;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Equipment")
+	ECombatType CombatType = ECombatType::SwordShield;
+
+public:
+	ASoulWeapon();
+	virtual void Tick(float DeltaTime) override;
+	
+	virtual void EquipItem() override;
+	virtual void UnequipItem() override;
+
+	FORCEINLINE FName GetEquipSocketName() const { return EquipSocketName; }
+	FORCEINLINE FName GetUnequipSocketName() const { return UnequipSocketName; }
 	
 	
+	float GetStaminaCost(const FGameplayTag& InTag) const;
+
+	UAnimMontage* GetMontageForTag(const FGameplayTag& InTag, const int32 Index = 0) const;
+
+	// 콜리저 관련
+	float GetAttackDamage() const;
+	FORCEINLINE UWeaponCollisionComponent* GetCollision() const {return WeaponCollisionComponent;}
+	void OnHitActor(const FHitResult& Hit);
+
+	FORCEINLINE ECombatType GetCombatType() const {return CombatType;}
+	virtual void ActivateCollision(EWeaponCollisionType InCollisionType);
+	virtual void DeactivateCollision(EWeaponCollisionType InCollisionType);
+
+protected:
+	virtual void BeginPlay() override;
 	
 };

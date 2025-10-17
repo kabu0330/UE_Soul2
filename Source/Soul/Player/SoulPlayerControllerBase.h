@@ -17,12 +17,6 @@ class SOUL_API ASoulPlayerControllerBase : public APlayerController
 {
 	GENERATED_BODY()
 
-public:
-	ASoulPlayerControllerBase();
-	virtual void BeginPlay() override;
-	virtual void SetupInputComponent() override;
-	virtual void PostInitializeComponents() override;
-
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "EnhancedInput|MappingContext")
 	TObjectPtr<UInputMappingContext> DefaultMappingContext;
@@ -78,4 +72,10 @@ private:
 	void Attack();
 	void SpecialAttack();
 	void HeavyAttack();
+
+public:
+	ASoulPlayerControllerBase();
+	virtual void BeginPlay() override;
+	virtual void SetupInputComponent() override;
+	virtual void PostInitializeComponents() override;
 };

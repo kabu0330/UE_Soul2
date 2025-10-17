@@ -20,6 +20,16 @@ UCLASS()
 class SOUL_API ASoulCharacterBase : public ACharacter
 {
 	GENERATED_BODY()
+	
+protected:
+	UPROPERTY(EditAnywhere, Category = "Components")
+	TObjectPtr<UAttributeComponent> AttributeComponent;
+
+	UPROPERTY(EditAnywhere, Category = "Components")
+	TObjectPtr<UStateComponent> StateComponent;
+
+	UPROPERTY(EditAnywhere, Category = "Components")
+	TObjectPtr<UCombatComponent> CombatComponent;
 
 public:
 	ASoulCharacterBase(const FObjectInitializer& ObjectInitializer);
@@ -41,19 +51,9 @@ public:
 	/** 공격 실행 */
 	void DoAttack(const FGameplayTag& AttackTypeTag);
 	void AttackFinished();
+
+	virtual void OnDeath();
 	
 protected:
 	virtual void BeginPlay() override;
-
-	UPROPERTY(EditAnywhere, Category = "Components")
-	TObjectPtr<UAttributeComponent> AttributeComponent;
-
-	UPROPERTY(EditAnywhere, Category = "Components")
-	TObjectPtr<UStateComponent> StateComponent;
-
-	UPROPERTY(EditAnywhere, Category = "Components")
-	TObjectPtr<UCombatComponent> CombatComponent;
-
-	
-
 };

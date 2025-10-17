@@ -12,7 +12,11 @@ UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class SOUL_API UStateComponent : public UActorComponent
 {
 	GENERATED_BODY()
-
+	
+protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "GameplayTags")
+	FGameplayTagContainer ActiveGameplayTags;
+	
 public:
 	UStateComponent();
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
@@ -40,9 +44,6 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "GameplayTags")
-	FGameplayTagContainer ActiveGameplayTags;
 
 	UFUNCTION()
 	void MovementInputEnableAction();

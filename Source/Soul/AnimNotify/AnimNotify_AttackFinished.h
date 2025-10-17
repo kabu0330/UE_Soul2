@@ -9,7 +9,7 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(meta = (DisplayName = "AttackFinished"))
 class SOUL_API UAnimNotify_AttackFinished : public UAnimNotify
 {
 	GENERATED_BODY()

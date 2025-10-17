@@ -73,15 +73,15 @@ void UWeaponCollisionComponent::CollisionTrace()
 
 	const bool bHit = UKismetSystemLibrary::SphereTraceMultiForObjects(
 		this,
-		Start,
-		End,
-		TraceRadius,
-		TraceObjectTypes,
-		false,
-		ActorsToIgnore,
-		DrawDebugType,
-		OutHits,
-		true
+		Start, // 시작 위치
+		End, // 끝 위치
+		TraceRadius, // 스피어 반지름 길이
+		TraceObjectTypes, // 오브젝트 타입
+		false, 
+		ActorsToIgnore, // 충돌 검사에서 제외할 액터(무기를 소유한 자신)
+		DrawDebugType, // EDrawDebugTrace::ForDuration : 기본 5초 동안 
+		OutHits, // 충돌한 액터를 모두 담아줄 배열
+		true // 나 자신(CollisionComponent)은 제외
 		);
 
 	if (bHit)

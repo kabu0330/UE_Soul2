@@ -20,7 +20,27 @@ class SOUL_API ASoulPlayerCharacter : public ASoulCharacterBase
 public:
 	FOnStateMessage OnStateMessage;
 	FTimerHandle StateMessageTimer;
+
+protected: // Components
+	/** 카메라 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components|Camera")
+	TObjectPtr<USpringArmComponent> CameraBoom;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components|Camera")
+	TObjectPtr<UCameraComponent> FollowCamera;
+
+protected: // Animation
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Animation|Montage")
+	TObjectPtr<UAnimMontage> RollingMontage;
 	
+protected: 
+	UPROPERTY(EditAnywhere, Category = "Camera")
+	float TargetArmLength = 400.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Attribute|Data")
+	float RollingCost = 15.f;
+
+public:
 	ASoulPlayerCharacter(const FObjectInitializer& ObjectInitializer);
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -50,26 +70,7 @@ public:
 	void Attack();
 	void SpecialAttack();
 	void HeavyAttack();
-	
+
 protected:
 	virtual void BeginPlay() override;
-
-protected: // Components
-	/** 카메라 */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components|Camera")
-	TObjectPtr<USpringArmComponent> CameraBoom;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components|Camera")
-	TObjectPtr<UCameraComponent> FollowCamera;
-
-protected: // Animation
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Animation|Montage")
-	TObjectPtr<UAnimMontage> RollingMontage;
-	
-protected: 
-	UPROPERTY(EditAnywhere, Category = "Camera")
-	float TargetArmLength = 400.0f;
-
-	UPROPERTY(EditAnywhere, Category = "Attribute|Data")
-	float RollingCost = 15.f;
 };

@@ -9,7 +9,7 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(meta = (DisplayName = "ComboWindow"))
 class SOUL_API UAnimNotify_ComboWindow : public UAnimNotifyState
 {
 	GENERATED_BODY()

@@ -16,6 +16,7 @@ UWeaponStatData::UWeaponStatData()
 	DamageMultiplierMap.Add(SoulGameplayTag::Character_Attack_Heavy, 1.8f);
 	DamageMultiplierMap.Add(SoulGameplayTag::Character_Attack_Running, 1.8f);
 	DamageMultiplierMap.Add(SoulGameplayTag::Character_Attack_Special, 2.1f);
+	DamageMultiplierMap.Add(SoulGameplayTag::Character_Attack_Light, 1.0f);
 }
 
 

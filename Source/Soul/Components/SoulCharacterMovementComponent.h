@@ -22,7 +22,6 @@ public:
 
 	void Sprint();
 	void StopSprinting();
-
 	bool IsMoving() const;
 
 protected:

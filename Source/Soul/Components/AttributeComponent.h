@@ -8,6 +8,7 @@
 #include "AttributeComponent.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnAttributeChanged, EAttributeType, Type, float, Ratio);
+DECLARE_MULTICAST_DELEGATE(FOnDeath);
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class SOUL_API UAttributeComponent : public UActorComponent
@@ -15,13 +16,10 @@ class SOUL_API UAttributeComponent : public UActorComponent
 	GENERATED_BODY()
 
 public:
-	UAttributeComponent();
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
-						   FActorComponentTickFunction* ThisTickFunction) override;
+	FOnAttributeChanged OnAttributeChanged;
+	FOnDeath OnDeath;
 
 protected:
-	virtual void BeginPlay() override;
-
 	// 스태미나 Section
 	/** 스태미나 */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Attribute|Stamina")
@@ -38,7 +36,18 @@ protected:
 
 	FTimerHandle StaminaRegenTimer;
 
+	// 체력
+	UPROPERTY(EditAnywhere, Category = "Health")
+	float BaseHealth = 100.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Health")
+	float MaxHealth = 100.0f;
+
 public:
+	UAttributeComponent();
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
+						   FActorComponentTickFunction* ThisTickFunction) override;
+	
 	FORCEINLINE float GetBaseStamina() const {return BaseStamina; }
 	FORCEINLINE float GetMaxStamina() const {return MaxStamina;}
 	FORCEINLINE float GetStaminaRate() const {return StaminaRate;}
@@ -51,8 +60,16 @@ public:
 
 	void ToggleStaminaRegeneration(bool bEnabled, float StartDelay = 1.f);
 	void BroadCastAttributeChanged(EAttributeType Type) const;
-	FOnAttributeChanged OnAttributeChanged;
 
+	// 체력
+	FORCEINLINE float GetBaseHealth() const {return BaseHealth;}
+	FORCEINLINE float GetMaxHealth() const {return MaxHealth;}
+
+	void TakeDamageAmount(float DamageAmount);
+
+protected:
+	virtual void BeginPlay() override;
+	
 private:
 	void RegenStaminaHandler();
 	

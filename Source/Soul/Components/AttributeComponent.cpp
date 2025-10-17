@@ -2,7 +2,11 @@
 
 
 #include "AttributeComponent.h"
+
+#include "StateComponent.h"
 #include "Soul/Soul.h"
+#include "Soul/SoulGameplayTag.h"
+#include "Soul/Character/SoulCharacterBase.h"
 
 
 UAttributeComponent::UAttributeComponent()
@@ -89,5 +93,29 @@ void UAttributeComponent::BroadCastAttributeChanged(EAttributeType Type) const
 	}
 
 	OnAttributeChanged.Broadcast(Type, Ratio);
+}
+
+void UAttributeComponent::TakeDamageAmount(float DamageAmount)
+{
+	BaseHealth = FMath::Clamp(BaseHealth - DamageAmount, 0.f, MaxHealth);
+	BroadCastAttributeChanged(EAttributeType::Health);
+
+	// 사망 처리 알림
+	if (0.f >= BaseHealth)
+	{
+		if (OnDeath.IsBound())
+		{
+			OnDeath.Broadcast();
+		}
+
+		if (const ASoulCharacterBase* CharacterBase = Cast<ASoulCharacterBase>(GetOwner()))
+		{
+			if (UStateComponent* StateComp = CharacterBase->GetStateComponent())
+			{
+				// 사망 상태 추가
+				StateComp->AddGameplayTag(SoulGameplayTag::Character_State_Death);
+			}
+		}
+	}
 }
 

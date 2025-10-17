@@ -20,15 +20,7 @@ class SOUL_API UWeaponCollisionComponent : public UActorComponent
 public:
 	FOnHitActor OnHitActor;
 	
-	UWeaponCollisionComponent();
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
-							   FActorComponentTickFunction* ThisTickFunction) override;
-
-	void BroadcastHitActor(const FHitResult& HitResult);
-	
 protected:
-	virtual void BeginPlay() override;
-
 	/** 시작 소켓 */
 	UPROPERTY(EditAnywhere)
 	FName TraceStartSocketName = "WeaponStart";
@@ -37,22 +29,8 @@ protected:
 	UPROPERTY(EditAnywhere)
 	FName TraceEndSocketName = "WeaponEnd";
 
-	// FHitResult 파라미터
-	/** 스피어 크기 */
-	UPROPERTY(EditAnywhere)
-	float TraceRadius = 20.f;
-
-	/** 충돌 트레이스 대상 오브젝트 타입 */
-	UPROPERTY(EditAnywhere)
-	TArray<TEnumAsByte<EObjectTypeQuery>> TraceObjectTypes;
-
-	/** 충돌 처리 제외 액터 */
-	UPROPERTY(EditAnywhere)
-	TArray<TObjectPtr<AActor>> ActorsToIgnore;
-
-	/** 드로우 디버그 타입 */
-	UPROPERTY(EditAnywhere)
-	TEnumAsByte<EDrawDebugTrace::Type> DrawDebugType = EDrawDebugTrace::ForDuration; 
+	/** 충돌 감지 트리거 */
+	bool bIsCollisionEnabled = false;
 
 	/** 무기의 메시 컴포넌트 */
 	UPROPERTY()
@@ -62,10 +40,30 @@ protected:
 	UPROPERTY()
 	TArray<TObjectPtr<AActor>> AlreadyHitActors;
 
-	/** 충돌 감지 트리거 */
-	bool bIsCollisionEnabled = false;
+	/** 충돌 처리 제외 액터 */
+	UPROPERTY(EditAnywhere)
+	TArray<TObjectPtr<AActor>> ActorsToIgnore;
+
+	/** 충돌 트레이스 대상 오브젝트 타입 */
+	UPROPERTY(EditAnywhere)
+	TArray<TEnumAsByte<EObjectTypeQuery>> TraceObjectTypes;
+
+	// FHitResult 파라미터
+	/** 스피어 크기 */
+	UPROPERTY(EditAnywhere)
+	float TraceRadius = 20.f;
+
+	/** 드로우 디버그 타입 */
+	UPROPERTY(EditAnywhere)
+	TEnumAsByte<EDrawDebugTrace::Type> DrawDebugType = EDrawDebugTrace::ForDuration; 
 	
 public:
+	UWeaponCollisionComponent();
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
+							   FActorComponentTickFunction* ThisTickFunction) override;
+
+	void BroadcastHitActor(const FHitResult& HitResult);
+	
 	/** 충돌 감지 트리거 함수 */
 	void TurnOnCollision();
 	
@@ -75,6 +73,8 @@ public:
 	void RemoveIgnoredActor(AActor* Actor);
 
 protected:
+	virtual void BeginPlay() override;
+	
 	bool CanHitActor(AActor* Actor) const;
 	void CollisionTrace();
 
