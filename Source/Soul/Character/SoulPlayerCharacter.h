@@ -28,6 +28,7 @@ public:
 	FORCEINLINE USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	FORCEINLINE float GetTargetArmLength() const { return TargetArmLength; }
 
+
 	/** 캐릭터가 특정 동작을 수행할 수 없을 때 UI로 출력시켜줄 메시지를 전송할 함수 */
 	void BroadcastStateMessage(const FString& Message);
 
@@ -44,6 +45,11 @@ public:
 	/** 전투 모드 변환 : 무기 손에 쥐기 <-> 무기 등에 부착 */
 	void ToggleCombatMode();
 	void AutoCombatMode();
+
+	// Combo Section : Input
+	void Attack();
+	void SpecialAttack();
+	void HeavyAttack();
 	
 protected:
 	virtual void BeginPlay() override;

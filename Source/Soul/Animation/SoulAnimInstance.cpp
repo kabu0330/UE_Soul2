@@ -39,7 +39,6 @@ void USoulAnimInstance::NativeUpdateAnimation(float DeltaSecond)
 	bShouldMove = GroundSpeed > 3.0f && MovementComponent->GetCurrentAcceleration() != FVector::Zero();
 	bIsFalling = MovementComponent->IsFalling();
 	
-	
 }
 
 void USoulAnimInstance::AnimNotify_ResetMovementInput()

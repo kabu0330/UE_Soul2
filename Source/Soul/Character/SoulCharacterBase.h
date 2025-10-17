@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "GameFramework/Character.h"
 #include "SoulCharacterBase.generated.h"
 
@@ -28,6 +29,18 @@ public:
 	FORCEINLINE UAttributeComponent* GetAttributeComponent() const {return AttributeComponent; }
 	FORCEINLINE UStateComponent* GetStateComponent() const {return StateComponent; }
 	FORCEINLINE UCombatComponent* GetCombatComponent() const {return CombatComponent; }
+
+	/** 현재 상태에서 수행 가능한 일반 공격 */
+	FGameplayTag GetAttackPerform() const;
+
+	/** 공격 가능 조건 체크 */
+	bool CanPerformAttack(const FGameplayTag& AttackTypeTag) const;
+
+	bool GetCurrentState(const FGameplayTag& InTag) const;
+
+	/** 공격 실행 */
+	void DoAttack(const FGameplayTag& AttackTypeTag);
+	void AttackFinished();
 	
 protected:
 	virtual void BeginPlay() override;
@@ -39,8 +52,8 @@ protected:
 	TObjectPtr<UStateComponent> StateComponent;
 
 	UPROPERTY(EditAnywhere, Category = "Components")
-	TObjectPtr<UCombatComponent> CombatComponent; 
+	TObjectPtr<UCombatComponent> CombatComponent;
 
-public:
+	
 
 };

@@ -46,8 +46,20 @@ void ASoulPlayerControllerBase::SetupInputComponent()
 
 		/** 픽업 아이템 줍기 */
 		EnhancedInputComp->BindAction(InteractAction, ETriggerEvent::Started, this, &ThisClass::Interact);
-		
+
+		/** 토글 디버그 */
 		EnhancedInputComp->BindAction(ToggleCombatModeAction, ETriggerEvent::Started, this, &ThisClass::ToggleCombatMode);
+
+		/** 공격 */
+		// 무기를 들고 있지 않으면 즉시 무기를 꺼내는 애니메이션 재생
+		EnhancedInputComp->BindAction(AttackAction, ETriggerEvent::Started, this, &ThisClass::AutoCombatMode);
+		// 마우스 버튼을 떼면 공격
+		EnhancedInputComp->BindAction(AttackAction, ETriggerEvent::Canceled, this, &ThisClass::Attack);
+		// 트리거 조건(마우스 버튼을 길게)이면 특수 공격
+		EnhancedInputComp->BindAction(AttackAction, ETriggerEvent::Triggered, this, &ThisClass::SpecialAttack);
+		// 특수 공격
+		EnhancedInputComp->BindAction(HeavyAttackAction, ETriggerEvent::Started, this, &ThisClass::HeavyAttack);
+
 	}
 }
 
@@ -156,5 +168,41 @@ void ASoulPlayerControllerBase::ToggleCombatMode()
 	if (ASoulPlayerCharacter* SoulCharacter = Cast<ASoulPlayerCharacter>(GetCharacter()))
 	{
 		SoulCharacter->ToggleCombatMode();
+	}
+}
+
+void ASoulPlayerControllerBase::AutoCombatMode()
+{
+	if (GetCharacter() == nullptr) return;
+	if (ASoulPlayerCharacter* SoulCharacter = Cast<ASoulPlayerCharacter>(GetCharacter()))
+	{
+		SoulCharacter->AutoCombatMode();
+	}
+}
+
+void ASoulPlayerControllerBase::Attack()
+{
+	if (GetCharacter() == nullptr) return;
+	if (ASoulPlayerCharacter* SoulCharacter = Cast<ASoulPlayerCharacter>(GetCharacter()))
+	{
+		SoulCharacter->Attack();
+	}
+}
+
+void ASoulPlayerControllerBase::SpecialAttack()
+{
+	if (GetCharacter() == nullptr) return;
+	if (ASoulPlayerCharacter* SoulCharacter = Cast<ASoulPlayerCharacter>(GetCharacter()))
+	{
+		SoulCharacter->SpecialAttack();
+	}
+}
+
+void ASoulPlayerControllerBase::HeavyAttack()
+{
+	if (GetCharacter() == nullptr) return;
+	if (ASoulPlayerCharacter* SoulCharacter = Cast<ASoulPlayerCharacter>(GetCharacter()))
+	{
+		SoulCharacter->HeavyAttack();
 	}
 }

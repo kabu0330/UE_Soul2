@@ -1,0 +1,104 @@
+﻿// Fill out your copyright notice in the Description page of Project Settings.
+
+
+#include "WeaponCollisionComponent.h"
+
+UWeaponCollisionComponent::UWeaponCollisionComponent()
+{
+	PrimaryComponentTick.bCanEverTick = true;
+
+	TraceObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_Pawn));
+}
+
+void UWeaponCollisionComponent::BeginPlay()
+{
+	Super::BeginPlay();
+}
+
+void UWeaponCollisionComponent::TickComponent(float DeltaTime, ELevelTick TickType,
+											  FActorComponentTickFunction* ThisTickFunction)
+{
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	
+	if (bIsCollisionEnabled)
+	{
+		CollisionTrace();
+	}
+}
+
+void UWeaponCollisionComponent::BroadcastHitActor(const FHitResult& HitResult)
+{
+	if (OnHitActor.IsBound())
+	{
+		OnHitActor.Broadcast(HitResult);
+	}
+}
+
+void UWeaponCollisionComponent::TurnOnCollision()
+{
+	AlreadyHitActors.Empty();
+	bIsCollisionEnabled = true;
+}
+
+void UWeaponCollisionComponent::TurnOffCollision()
+{
+	bIsCollisionEnabled = false;
+}
+
+void UWeaponCollisionComponent::SetWeaponMesh(UPrimitiveComponent* MeshComponent)
+{
+	WeaponMesh = MeshComponent;
+}
+
+void UWeaponCollisionComponent::AddIgnoredActor(AActor* Actor)
+{
+	ActorsToIgnore.Add(Actor);
+}
+
+void UWeaponCollisionComponent::RemoveIgnoredActor(AActor* Actor)
+{
+	ActorsToIgnore.Remove(Actor);
+}
+
+bool UWeaponCollisionComponent::CanHitActor(AActor* Actor) const
+{
+	return AlreadyHitActors.Contains(Actor) == false;
+}
+
+void UWeaponCollisionComponent::CollisionTrace()
+{
+	TArray<FHitResult> OutHits;
+	const FVector Start = WeaponMesh->GetSocketLocation(TraceStartSocketName);
+	const FVector End = WeaponMesh->GetSocketLocation(TraceEndSocketName);
+
+	const bool bHit = UKismetSystemLibrary::SphereTraceMultiForObjects(
+		this,
+		Start,
+		End,
+		TraceRadius,
+		TraceObjectTypes,
+		false,
+		ActorsToIgnore,
+		DrawDebugType,
+		OutHits,
+		true
+		);
+
+	if (bHit)
+	{
+		for (const FHitResult& OutHit : OutHits)
+		{
+			AActor* HitActor = OutHit.GetActor();
+			if (nullptr == HitActor) return;
+
+			if (CanHitActor(HitActor)) // 이번 프레임에 충돌한 액터라면
+			{
+				AlreadyHitActors.Add(HitActor);
+				BroadcastHitActor(OutHit);
+			}
+		}
+	}
+}
+
+
+

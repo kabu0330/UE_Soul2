@@ -48,7 +48,13 @@ protected:
 	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite, Category = "EnhancedInput|InputAction")
 	TObjectPtr<UInputAction> ToggleCombatModeAction;
 
-protected:
+	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite, Category = "EnhancedInput|InputAction")
+	TObjectPtr<UInputAction> AttackAction;
+
+	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite, Category = "EnhancedInput|InputAction")
+	TObjectPtr<UInputAction> HeavyAttackAction;
+
+private:
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
 	void Zoom(const FInputActionValue& Value);
@@ -66,5 +72,10 @@ protected:
 
 	void Interact();
 	void ToggleCombatMode();
-	
+
+	/** 공격 */
+	void AutoCombatMode();
+	void Attack();
+	void SpecialAttack();
+	void HeavyAttack();
 };

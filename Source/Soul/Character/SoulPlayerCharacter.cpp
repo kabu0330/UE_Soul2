@@ -11,15 +11,14 @@
 #include "Soul/SoulGameplayTag.h"
 #include "Soul/Components/AttributeComponent.h"
 #include "Soul/Components/CombatComponent.h"
+#include "Soul/Components/SoulCharacterMovementComponent.h"
 #include "Soul/Components/StateComponent.h"
-#include "Soul/Data/MontageActionData.h"
 #include "Soul/Equipment/SoulWeapon.h"
 #include "Soul/Interface/SoulInteract.h"
 
 ASoulPlayerCharacter::ASoulPlayerCharacter(const FObjectInitializer& ObjectInitializer)
 	:Super(ObjectInitializer)
 {
-	
 	PrimaryActorTick.bCanEverTick = true;
 
 	bUseControllerRotationPitch = false;
@@ -102,7 +101,7 @@ void ASoulPlayerCharacter::Interact()
 	FHitResult OutHit;
 	const FVector Start = GetActorLocation();
 	const FVector End = Start;
-	constexpr float Radius = 200.f; 
+	constexpr float Radius = 150.f; 
 
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
 	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(COLLISION_OBJECT_INTERACT));
@@ -140,32 +139,25 @@ void ASoulPlayerCharacter::ToggleCombatMode()
 		return;
 	}
 
-	if (UMontageActionData* MontageData = Weapon->MontageActionData; IsValid(MontageData))
+	UAnimMontage* AnimMontage = nullptr;
+	if (CombatComponent->IsCombatEnabled()) // 전투 모드일 때 토글 함수가 호출되면 비전투 모드로
 	{
-		UAnimMontage* AnimMontage = nullptr;
-		if (CombatComponent->IsCombatEnabled()) // 전투 모드일 때 토글 함수가 호출되면 비전투 모드로
-		{
-			AnimMontage = MontageData->GetMontageForTag(SoulGameplayTag::Character_Action_Unequip);
-		}
-		else // 비전투 모드일 때 토글 함수가 호출되면 전투 모드로
-		{
-			AnimMontage = MontageData->GetMontageForTag(SoulGameplayTag::Character_Action_Equip);
-		}
-
-		if (false == IsValid(AnimMontage))
-		{
-			LOG_ERROR("Weapon에 무기 장착/탈착 애니메이션이 등록되지 않았습니다: %s, %s", *Weapon->GetName(), *MontageData->GetName());
-			return;
-		}
-
-		// 상태 등록 및 애니메이션 실행
-		StateComponent->AddGameplayTag(SoulGameplayTag::Character_State_GeneralAction);
-		PlayAnimMontage(AnimMontage);
+		AnimMontage = Weapon->GetMontageForTag(SoulGameplayTag::Character_Action_Unequip);
 	}
-	else
+	else // 비전투 모드일 때 토글 함수가 호출되면 전투 모드로
 	{
-		LOG_ERROR("무기에 몽타주 액션 데이터 에셋이 등록되지 않았습니다. %s", *Weapon->GetName());
+		AnimMontage = Weapon->GetMontageForTag(SoulGameplayTag::Character_Action_Equip);
 	}
+
+	if (false == IsValid(AnimMontage))
+	{
+		LOG_ERROR("Weapon에 무기 장착/탈착 애님 몽타주 또는 태그가 설정되지 않았습니다.: %s", *Weapon->GetName());
+		return;
+	}
+
+	// 상태 등록 및 애니메이션 실행
+	StateComponent->AddGameplayTag(SoulGameplayTag::Character_State_GeneralAction);
+	PlayAnimMontage(AnimMontage);
 }
 
 void ASoulPlayerCharacter::AutoCombatMode()
@@ -190,4 +182,23 @@ bool ASoulPlayerCharacter::CanToggleCombatMode() const
 	
 	return false == StateComponent->IsAnyActiveGameplayTags(CheckTags);
 }
+
+void ASoulPlayerCharacter::Attack()
+{
+	check(CombatComponent);
+	CombatComponent->Attack();
+}
+
+void ASoulPlayerCharacter::SpecialAttack()
+{
+	check(CombatComponent);
+	CombatComponent->SpecialAttack();
+}
+
+void ASoulPlayerCharacter::HeavyAttack()
+{
+	check(CombatComponent);
+	CombatComponent->HeavyAttack();
+}
+
 
