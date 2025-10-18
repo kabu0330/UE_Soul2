@@ -3,24 +3,18 @@
 
 #include "AnimNotify_WeaponCollision.h"
 
-#include "Soul/Character/SoulPlayerCharacter.h"
-#include "Soul/Components/CombatComponent.h"
-#include "Soul/Components/WeaponCollisionComponent.h"
-#include "Soul/Equipment/SoulWeapon.h"
+#include "Soul/Interface/SoulCombatInterface.h"
 
 void UAnimNotify_WeaponCollision::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation,
                                               float TotalDuration, const FAnimNotifyEventReference& EventReference)
 {
 	Super::NotifyBegin(MeshComp, Animation, TotalDuration, EventReference);
 
-	if (const ASoulPlayerCharacter* SoulCharacter = Cast<ASoulPlayerCharacter>(MeshComp->GetOwner()))
+	if (AActor* OwnerActor = MeshComp->GetOwner())
 	{
-		if (const UCombatComponent* CombatComp = SoulCharacter->GetCombatComponent())
+		if (ISoulCombatInterface* CombatInterface = Cast<ISoulCombatInterface>(OwnerActor))
 		{
-			if (ASoulWeapon* Weapon = CombatComp->GetMainWeapon())
-			{
-				Weapon->GetCollision()->TurnOnCollision();
-			}
+			CombatInterface->ActivateCollision(CollisionType);
 		}
 	}
 }
@@ -30,14 +24,11 @@ void UAnimNotify_WeaponCollision::NotifyEnd(USkeletalMeshComponent* MeshComp, UA
 {
 	Super::NotifyEnd(MeshComp, Animation, EventReference);
 
-	if (const ASoulPlayerCharacter* SoulCharacter = Cast<ASoulPlayerCharacter>(MeshComp->GetOwner()))
+	if (AActor* OwnerActor = MeshComp->GetOwner())
 	{
-		if (const UCombatComponent* CombatComp = SoulCharacter->GetCombatComponent())
+		if (ISoulCombatInterface* CombatInterface = Cast<ISoulCombatInterface>(OwnerActor))
 		{
-			if (ASoulWeapon* Weapon = CombatComp->GetMainWeapon())
-			{
-				Weapon->GetCollision()->TurnOffCollision();
-			}
+			CombatInterface->DeactivateCollision(CollisionType);
 		}
 	}
 }

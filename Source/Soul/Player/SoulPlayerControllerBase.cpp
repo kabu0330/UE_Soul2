@@ -23,6 +23,8 @@ void ASoulPlayerControllerBase::BeginPlay()
 	{
 		Subsystem->AddMappingContext(DefaultMappingContext, 0);
 	}
+
+	//SetShowMouseCursor(true);
 }
 
 void ASoulPlayerControllerBase::SetupInputComponent()
@@ -60,6 +62,11 @@ void ASoulPlayerControllerBase::SetupInputComponent()
 		// 특수 공격
 		EnhancedInputComp->BindAction(HeavyAttackAction, ETriggerEvent::Started, this, &ThisClass::HeavyAttack);
 
+		// 타게팅
+		EnhancedInputComp->BindAction(LockOnTargetAction, ETriggerEvent::Started, this, &ThisClass::LockOnTarget);
+		EnhancedInputComp->BindAction(LeftTargetAction, ETriggerEvent::Started, this, &ThisClass::LeftTarget);
+		EnhancedInputComp->BindAction(RightTargetAction, ETriggerEvent::Started, this, &ThisClass::RightTarget);
+
 	}
 }
 
@@ -70,7 +77,7 @@ void ASoulPlayerControllerBase::PostInitializeComponents()
 	if (PlayerCameraManager)
 	{
 		PlayerCameraManager->ViewPitchMin = -45.f; // 위
-		PlayerCameraManager->ViewPitchMax = 5.f; // 아래
+		PlayerCameraManager->ViewPitchMax = 10.f; // 아래
 	}
 }
 
@@ -106,10 +113,10 @@ void ASoulPlayerControllerBase::Zoom(const FInputActionValue& Value)
 	{
 		if (USpringArmComponent* CameraBoom = SoulCharacter->GetCameraBoom(); IsValid(CameraBoom))
 		{
-			const float ZoomValue = Value.Get<float>() * 10.f;
+			const float ZoomValue = Value.Get<float>() * 20.f;
 			const float Length = SoulCharacter->GetTargetArmLength();
 			CameraBoom->TargetArmLength = FMath::Clamp(
-				CameraBoom->TargetArmLength + ZoomValue, Length - 300.f, Length + 100.f);
+				CameraBoom->TargetArmLength + ZoomValue, Length - 300.f, Length + 200.f);
 		}
 	}
 }
@@ -204,5 +211,32 @@ void ASoulPlayerControllerBase::HeavyAttack()
 	if (ASoulPlayerCharacter* SoulCharacter = Cast<ASoulPlayerCharacter>(GetCharacter()))
 	{
 		SoulCharacter->HeavyAttack();
+	}
+}
+
+void ASoulPlayerControllerBase::LockOnTarget()
+{
+	if (GetCharacter() == nullptr) return;
+	if (ASoulPlayerCharacter* SoulCharacter = Cast<ASoulPlayerCharacter>(GetCharacter()))
+	{
+		SoulCharacter->LockOnTarget();
+	}
+}
+
+void ASoulPlayerControllerBase::LeftTarget()
+{
+	if (GetCharacter() == nullptr) return;
+	if (ASoulPlayerCharacter* SoulCharacter = Cast<ASoulPlayerCharacter>(GetCharacter()))
+	{
+		SoulCharacter->LeftTarget();
+	}
+}
+
+void ASoulPlayerControllerBase::RightTarget()
+{
+	if (GetCharacter() == nullptr) return;
+	if (ASoulPlayerCharacter* SoulCharacter = Cast<ASoulPlayerCharacter>(GetCharacter()))
+	{
+		SoulCharacter->RightTarget();
 	}
 }

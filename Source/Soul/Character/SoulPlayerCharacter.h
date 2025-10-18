@@ -4,16 +4,20 @@
 
 #include "CoreMinimal.h"
 #include "SoulCharacterBase.h"
+#include "Soul/Interface/SoulCombatInterface.h"
 #include "SoulPlayerCharacter.generated.h"
 
+class ASoulFistWeapon;
+class UTargetingComponent;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnStateMessage, const FString&, Message);
 
 class UInputAction;
 class UCameraComponent;
 class USpringArmComponent;
+class UMotionWarpingComponent;
 
 UCLASS()
-class SOUL_API ASoulPlayerCharacter : public ASoulCharacterBase
+class SOUL_API ASoulPlayerCharacter : public ASoulCharacterBase, public ISoulCombatInterface
 {
 	GENERATED_BODY()
 	
@@ -29,9 +33,22 @@ protected: // Components
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components|Camera")
 	TObjectPtr<UCameraComponent> FollowCamera;
 
+	/** 애니메이션 모션 워핑 지원(Beta) */
+	UPROPERTY(EditAnywhere, Category = "Components")
+	TObjectPtr<UMotionWarpingComponent> MotionWarpingComponent;
+
+	/** 타게팅 */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Components)
+	TObjectPtr<UTargetingComponent> TargetingComponent;
+
+	/** 주먹 무기 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
+	TSubclassOf<ASoulFistWeapon> FistWeaponClass;
+
 protected: // Animation
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Animation|Montage")
 	TObjectPtr<UAnimMontage> RollingMontage;
+
 	
 protected: 
 	UPROPERTY(EditAnywhere, Category = "Camera")
@@ -46,6 +63,7 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	FORCEINLINE USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
+	FORCEINLINE UCameraComponent* GetCameraComponent() const { return FollowCamera; }
 	FORCEINLINE float GetTargetArmLength() const { return TargetArmLength; }
 
 
@@ -70,6 +88,18 @@ public:
 	void Attack();
 	void SpecialAttack();
 	void HeavyAttack();
+
+	/** 모션 워핑 */
+	virtual void MotionWarpingMouseCursor() override;
+
+	// 타게팅
+	void LockOnTarget();
+	void LeftTarget();
+	void RightTarget();
+
+	/** ISoulCombat Interface : 편의성 기능*/
+	virtual void ActivateCollision(EWeaponCollisionType InCollisionType);
+	virtual void DeactivateCollision(EWeaponCollisionType InCollisionType);
 
 protected:
 	virtual void BeginPlay() override;

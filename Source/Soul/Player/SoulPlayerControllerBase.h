@@ -48,6 +48,15 @@ protected:
 	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite, Category = "EnhancedInput|InputAction")
 	TObjectPtr<UInputAction> HeavyAttackAction;
 
+	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite, Category = "EnhancedInput|InputAction")
+	TObjectPtr<UInputAction> LockOnTargetAction;
+
+	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite, Category = "EnhancedInput|InputAction")
+	TObjectPtr<UInputAction> LeftTargetAction;
+
+	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite, Category = "EnhancedInput|InputAction")
+	TObjectPtr<UInputAction> RightTargetAction;
+
 private:
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
@@ -73,6 +82,11 @@ private:
 	void SpecialAttack();
 	void HeavyAttack();
 
+	// 타게팅
+	void LockOnTarget();
+	void LeftTarget();
+	void RightTarget();
+	
 public:
 	ASoulPlayerControllerBase();
 	virtual void BeginPlay() override;

@@ -10,7 +10,7 @@
 /**
  * 
  */
-UCLASS(meta = (DisplayName = "EquipWeapon"))
+UCLASS(DisplayName = "EquipWeapon")
 class SOUL_API UAnimNotify_EquipWeapon : public UAnimNotify
 {
 	GENERATED_BODY()

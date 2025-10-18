@@ -47,6 +47,16 @@ void USoulCharacterMovementComponent::Sprint()
 		return;
 	}
 
+	// 공격 중에는 질주 상태 종료, 스태미나 소모 차단
+	if (ASoulCharacterBase* Character = Cast<ASoulCharacterBase>(GetOwner()))
+	{
+		if (true == Character->GetCurrentState(SoulGameplayTag::Character_State_Attacking))
+		{
+			StopSprinting();
+			return;
+		}
+	}
+
 	if (AttributeComponent->CheckHasEnoughStamina(5.f) && IsMovingOnGround())
 	{
 		// 이동속도 향상
@@ -75,6 +85,11 @@ void USoulCharacterMovementComponent::Sprint()
 
 void USoulCharacterMovementComponent::StopSprinting()
 {
+	ASoulPlayerCharacter* PlayerCharacter = Cast<ASoulPlayerCharacter>(GetOwner());
+
+	// 질주 상태일 때만 해당 함수가 동작하도록 예외처리
+	if (false == PlayerCharacter->GetCurrentState(SoulGameplayTag::Character_State_Sprinting)) return;
+	
 	// 이동속도 복원
 	MaxWalkSpeed = BaseSpeed;
 
@@ -84,7 +99,6 @@ void USoulCharacterMovementComponent::StopSprinting()
 	bSprinting = false;
 
 	// 상태 태그 삭제
-	ASoulPlayerCharacter* PlayerCharacter = Cast<ASoulPlayerCharacter>(GetOwner());
 	if (IsValid(PlayerCharacter))
 	{
 		PlayerCharacter->GetStateComponent()->RemoveGameplayTag(SoulGameplayTag::Character_State_Sprinting);

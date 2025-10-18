@@ -4,12 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "Animation/AnimNotifies/AnimNotifyState.h"
+#include "Soul/SoulDefine.h"
 #include "AnimNotify_WeaponCollision.generated.h"
 
 /**
  * 
  */
-UCLASS(meta = (DisplayName = "WeaponCollision"))
+UCLASS(DisplayName = "WeaponCollision")
 class SOUL_API UAnimNotify_WeaponCollision : public UAnimNotifyState
 {
 	GENERATED_BODY()
@@ -19,5 +20,9 @@ public:
 		float TotalDuration, const FAnimNotifyEventReference& EventReference) override;
 	virtual void NotifyEnd(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation,
 		const FAnimNotifyEventReference& EventReference) override;
-	
+
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	EWeaponCollisionType CollisionType = EWeaponCollisionType::MainCollision;
+		
 };

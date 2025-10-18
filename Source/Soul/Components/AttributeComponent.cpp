@@ -7,6 +7,7 @@
 #include "Soul/Soul.h"
 #include "Soul/SoulGameplayTag.h"
 #include "Soul/Character/SoulCharacterBase.h"
+#include "Soul/Character/SoulPlayerCharacter.h"
 
 
 UAttributeComponent::UAttributeComponent()
@@ -30,6 +31,15 @@ void UAttributeComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 
 bool UAttributeComponent::CheckHasEnoughStamina(const float Stamina) const
 {
+	const bool bResult = BaseStamina >= Stamina;
+	if (false == bResult)
+	{
+		if (ASoulPlayerCharacter* PlayerCharacter = Cast<ASoulPlayerCharacter>(GetOwner()))
+		{
+			const FString Message = TEXT("스태미나가 부족합니다.");
+			PlayerCharacter->BroadcastStateMessage(Message);
+		}
+	}
 	return BaseStamina >= Stamina;
 }
 

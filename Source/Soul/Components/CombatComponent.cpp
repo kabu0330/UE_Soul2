@@ -39,6 +39,7 @@ void UCombatComponent::SetWeapon(ASoulWeapon* NewWeapon)
 
 			// 픽업 아이템이 표시할 BP 클래스가 무엇인지 알려주기 위해 스폰 액터 디퍼드 사용 
 			PickupItem->SetEquipmentClass(MainWeapon->GetClass());
+			PickupItem->InitSpawn();
 			
 			PickupItem->FinishSpawning(CharacterBase->GetTransform());
 
@@ -48,6 +49,15 @@ void UCombatComponent::SetWeapon(ASoulWeapon* NewWeapon)
 
 	// 무기 설정
 	MainWeapon = NewWeapon;
+}
+
+void UCombatComponent::SetCombatEnabled(const bool bEnabled)
+{
+	bCombatEnabled = bEnabled;
+	if (OnChangedCombat.IsBound())
+	{
+		OnChangedCombat.Broadcast(bEnabled);
+	}
 }
 
 void UCombatComponent::Attack()

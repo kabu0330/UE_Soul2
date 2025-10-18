@@ -19,10 +19,10 @@ class SOUL_API ASoulWeapon : public ASoulEquipment
 	GENERATED_BODY()
 
 protected:
-	UPROPERTY(EditDefaultsOnly, Category = "Weapon|SocketName")
+	UPROPERTY(EditDefaultsOnly, Category = "Equipment|SocketName")
 	FName EquipSocketName = "SwordEquipWeapon";
 
-	UPROPERTY(EditDefaultsOnly, Category = "Weapon|SocketName")
+	UPROPERTY(EditDefaultsOnly, Category = "Equipment|SocketName")
 	FName UnequipSocketName = "SwordUnequipWeapon";
 
 	/** 캐릭터의 무기 장착과 관련된 기능을 처리하는 컴포넌트 */
@@ -32,10 +32,13 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Components")
 	TObjectPtr<UWeaponCollisionComponent> WeaponCollisionComponent;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Weapon|Data")
+	UPROPERTY(EditAnywhere, Category = "Components")
+	TObjectPtr<UWeaponCollisionComponent> SecondWeaponCollisionComponent;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Equipment|Data")
 	TObjectPtr<UWeaponStatData> WeaponStatDataAsset;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Weapon|Animation")
+	UPROPERTY(EditDefaultsOnly, Category = "Equipment|Animation")
 	TObjectPtr<UMontageActionData> MontageActionData;
 
 	/** Combat Type */

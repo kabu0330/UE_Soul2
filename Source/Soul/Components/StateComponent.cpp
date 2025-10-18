@@ -5,6 +5,7 @@
 
 #include "Kismet/KismetSystemLibrary.h"
 #include "Soul/Soul.h"
+#include "Soul/Character/SoulPlayerCharacter.h"
 #include "Soul/SoulGameplayTag.h"
 
 
@@ -23,6 +24,8 @@ void UStateComponent::BeginPlay()
 void UStateComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+	if (nullptr == Cast<ASoulPlayerCharacter>(GetOwner())) return;
 	
 	uint64 Index = 1000;
 	GEngine->AddOnScreenDebugMessage(Index++, 10.f, FColor::Cyan, FString::Printf(TEXT("Active Gameplay Tags : ")));

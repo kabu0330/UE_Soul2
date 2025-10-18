@@ -46,13 +46,22 @@ public:
 	/** 공격 가능 조건 체크 */
 	bool CanPerformAttack(const FGameplayTag& AttackTypeTag) const;
 
+	/** 현재 상태에 태그가 포함되어 있는지 검사 */
 	bool GetCurrentState(const FGameplayTag& InTag) const;
+
+	/** 현재 상태에 여러 태그 중 '하나(or)' 이상 있는지 검사 */
+	bool GetCurrentState(const FGameplayTagContainer& InTag) const;
 
 	/** 공격 실행 */
 	void DoAttack(const FGameplayTag& AttackTypeTag);
+
+	/** 모션 워핑 */
+	virtual void MotionWarpingMouseCursor() {};
+	
 	void AttackFinished();
 
 	virtual void OnDeath();
+
 	
 protected:
 	virtual void BeginPlay() override;

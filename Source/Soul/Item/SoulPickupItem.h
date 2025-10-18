@@ -23,6 +23,8 @@ public:
 	/** ISoulInteract Interface */
 	virtual void Interact(AActor* InteractActor) override;
 
+	void InitSpawn();
+
 protected:
 	virtual void BeginPlay() override;
 

@@ -15,6 +15,9 @@
 #include "Soul/Components/StateComponent.h"
 #include "Soul/Equipment/SoulWeapon.h"
 #include "Soul/Interface/SoulInteract.h"
+#include "MotionWarpingComponent.h"
+#include "Soul/Components/TargetingComponent.h"
+#include "Soul/Equipment/SoulFistWeapon.h"
 
 ASoulPlayerCharacter::ASoulPlayerCharacter(const FObjectInitializer& ObjectInitializer)
 	:Super(ObjectInitializer)
@@ -37,12 +40,24 @@ ASoulPlayerCharacter::ASoulPlayerCharacter(const FObjectInitializer& ObjectIniti
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>("FollowCamera");
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	FollowCamera->bUsePawnControlRotation = false; // 스프링 암이 캐릭터 회전을 따라가므로 카메라는 꺼준다.
+
+	MotionWarpingComponent = CreateDefaultSubobject<UMotionWarpingComponent>("MotionWarpingComponent");
+	TargetingComponent = CreateDefaultSubobject<UTargetingComponent>("TargetingComponent");
+	
 }
 
 void ASoulPlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	// 주먹 무기 장착
+	if (FistWeaponClass)
+	{
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.Owner = this;
+		ASoulFistWeapon* FistWeapon = GetWorld()->SpawnActor<ASoulFistWeapon>(FistWeaponClass, GetActorTransform(), SpawnParams);
+		FistWeapon->EquipItem();
+	}
 }
 
 void ASoulPlayerCharacter::Tick(float DeltaTime)
@@ -165,7 +180,7 @@ void ASoulPlayerCharacter::AutoCombatMode()
 	check(CombatComponent);
 	
 	// 비전투 상태일 때만 토글 함수가 호출되므로 항상 전투모드로 전환시켜주는 함수
-	if (CombatComponent->IsCombatEnabled() == false)
+	if (false == CombatComponent->IsCombatEnabled())
 	{
 		ToggleCombatMode();
 	}
@@ -174,6 +189,9 @@ void ASoulPlayerCharacter::AutoCombatMode()
 bool ASoulPlayerCharacter::CanToggleCombatMode() const
 {
 	check(StateComponent);
+
+	if (false == IsValid(CombatComponent->GetMainWeapon())) return false; 
+	if (CombatComponent->GetMainWeapon()->GetCombatType() == ECombatType::MeleeFists) return false;
 
 	FGameplayTagContainer CheckTags;
 	CheckTags.AddTag(SoulGameplayTag::Character_State_GeneralAction);
@@ -199,6 +217,93 @@ void ASoulPlayerCharacter::HeavyAttack()
 {
 	check(CombatComponent);
 	CombatComponent->HeavyAttack();
+}
+
+void ASoulPlayerCharacter::MotionWarpingMouseCursor()
+{
+	APlayerController* PC = Cast<APlayerController>(GetController());
+	if (false == IsValid(PC)) return;
+
+	FVector WorldLocation, WorldDirection;
+	if (PC->DeprojectMousePositionToWorld(WorldLocation, WorldDirection))
+	{
+		const FVector Start = WorldLocation;
+		const FVector End = Start + (WorldDirection * 10000.f);
+		FHitResult OutHit;
+		FCollisionQueryParams Params;
+		Params.AddIgnoredActor(this);
+
+		if (GetWorld()->LineTraceSingleByChannel(OutHit, Start, End, ECC_Visibility, Params))
+		{
+			FVector TargetLocation = OutHit.Location;
+
+			FVector Direction = (TargetLocation - GetActorLocation()).GetSafeNormal();
+			FRotator TargetRotation = Direction.Rotation();
+
+			FVector DesiredLocation = GetActorLocation() + (Direction * 100.0f);
+
+			FHitResult MoveHit;
+			float Radius = 25.f;
+
+			bool bHit = GetWorld()->SweepSingleByChannel(
+				MoveHit,
+				GetActorLocation(),
+				DesiredLocation,
+				FQuat::Identity,
+				ECC_Visibility,
+				FCollisionShape::MakeSphere(Radius),
+				Params);
+
+			FVector FinalLocation = bHit ?  GetActorLocation() : DesiredLocation;
+
+			TargetRotation.Pitch = 0.f;
+			TargetRotation.Roll = 0.f;
+
+			FTransform TargetTransform;
+			TargetTransform.SetLocation(FinalLocation);
+			TargetTransform.SetRotation(TargetRotation.Quaternion());
+
+			if (IsValid(MotionWarpingComponent))
+			{
+				LOG_WARNING(">>> Motion Warping <<<");
+				MotionWarpingComponent->AddOrUpdateWarpTargetFromTransform(TEXT("Target"), TargetTransform);
+			}
+		}
+	}
+}
+
+void ASoulPlayerCharacter::LockOnTarget()
+{
+	check(TargetingComponent);
+	TargetingComponent->ToggleLockOn();
+}
+
+void ASoulPlayerCharacter::LeftTarget()
+{
+	TargetingComponent->SwitchingLockedOnActor(ESwitchingDirection::Left);
+}
+
+void ASoulPlayerCharacter::RightTarget()
+{
+	TargetingComponent->SwitchingLockedOnActor(ESwitchingDirection::Right);
+}
+
+void ASoulPlayerCharacter::ActivateCollision(EWeaponCollisionType InCollisionType)
+{
+	check(CombatComponent);
+	if (ASoulWeapon* Weapon = CombatComponent->GetMainWeapon())
+	{
+		Weapon->ActivateCollision(InCollisionType);
+	}
+}
+
+void ASoulPlayerCharacter::DeactivateCollision(EWeaponCollisionType InCollisionType)
+{
+	check(CombatComponent);
+	if (ASoulWeapon* Weapon = CombatComponent->GetMainWeapon())
+	{
+		Weapon->DeactivateCollision(InCollisionType);
+	}
 }
 
 

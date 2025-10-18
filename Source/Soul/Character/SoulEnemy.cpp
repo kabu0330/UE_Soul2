@@ -4,11 +4,15 @@
 #include "SoulEnemy.h"
 
 #include "Components/CapsuleComponent.h"
+#include "Components/SphereComponent.h"
+#include "Components/WidgetComponent.h"
 #include "Engine/DamageEvents.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Soul/Soul.h"
+#include "Soul/SoulGameplayTag.h"
 #include "Soul/Components/AttributeComponent.h"
+#include "Soul/Components/StateComponent.h"
 #include "Sound/SoundCue.h"
 
 
@@ -19,6 +23,20 @@ ASoulEnemy::ASoulEnemy(const FObjectInitializer& ObjectInitializer)
 
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
 	GetMesh()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
+
+	// 타게팅
+	TargetingSphereComponent = CreateDefaultSubobject<USphereComponent>("TargetingSphereComponent");
+	TargetingSphereComponent->SetupAttachment(GetRootComponent());
+	TargetingSphereComponent->SetCollisionObjectType(COLLISION_OBJECT_TARGETING);
+	TargetingSphereComponent->SetCollisionResponseToAllChannels(ECR_Ignore);
+	TargetingSphereComponent->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block); // 비지빌리티 트레이스 채널만 켜고 나머지는 다 무시
+
+	LockOnWidgetComponent = CreateDefaultSubobject<UWidgetComponent>("LockOnWidgetComponent");
+	LockOnWidgetComponent->SetupAttachment(GetRootComponent());
+	LockOnWidgetComponent->SetRelativeLocation(FVector(0.f, 0.f, 50.f));
+	LockOnWidgetComponent->SetDrawSize(FVector2D(100.f, 100.f));
+	LockOnWidgetComponent->SetWidgetSpace(EWidgetSpace::Screen); // 2D
+	LockOnWidgetComponent->SetVisibility(false); // 안 보이게
 }
 
 void ASoulEnemy::BeginPlay()
@@ -144,10 +162,15 @@ UAnimMontage* ASoulEnemy::GetHitReactAnimation(const AActor* Attacker) const
 
 void ASoulEnemy::OnTargeted(bool bTarget)
 {
+	check(LockOnWidgetComponent);
+	LockOnWidgetComponent->SetVisibility(bTarget);
 }
 
 bool ASoulEnemy::CanBeTargeted()
 {
-	return false;
+	check(StateComponent);
+	FGameplayTagContainer CheckTags;
+	CheckTags.AddTag(SoulGameplayTag::Character_State_Death);
+	return false == StateComponent->IsAnyActiveGameplayTags(CheckTags);
 }
 

@@ -40,6 +40,7 @@ protected:
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<USphereComponent> TargetingSphereComponent;
 
+	/** 타게팅 표시용 위젯 */
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UWidgetComponent> LockOnWidgetComponent;
 
@@ -60,6 +61,8 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+
+	// 피격시 호출될 함수들
 	void ImpactEffect(const FVector& Location);
 	void HitReaction(const AActor* Attacker);
 	

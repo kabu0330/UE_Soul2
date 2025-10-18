@@ -10,7 +10,7 @@
 /**
  * 
  */
-UCLASS(meta = (DisplayName = "Remove Gameplay Tag"))
+UCLASS(DisplayName = "RemoveState")
 class SOUL_API UAnimNotify_RemoveGameplayTag : public UAnimNotify
 {
 	GENERATED_BODY()

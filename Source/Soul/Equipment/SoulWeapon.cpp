@@ -3,8 +3,10 @@
 
 #include "SoulWeapon.h"
 
+#include "SGameplayTagPicker.h"
 #include "Kismet/GameplayStatics.h"
 #include "Soul/Soul.h"
+#include "Soul/Animation/SoulAnimInstance.h"
 #include "Soul/Character/SoulPlayerCharacter.h"
 #include "Soul/Components/CombatComponent.h"
 #include "Soul/Components/WeaponCollisionComponent.h"
@@ -15,8 +17,12 @@
 ASoulWeapon::ASoulWeapon()
 {
 	PrimaryActorTick.bCanEverTick = true;
+	
 	WeaponCollisionComponent = CreateDefaultSubobject<UWeaponCollisionComponent>("WeaponCollisionComponent");
 	WeaponCollisionComponent->OnHitActor.AddUObject(this, &ThisClass::OnHitActor); // 델리게이트
+	
+	SecondWeaponCollisionComponent = CreateDefaultSubobject<UWeaponCollisionComponent>("SecondWeaponCollisionComponent");
+	SecondWeaponCollisionComponent->OnHitActor.AddUObject(this, &ThisClass::OnHitActor);
 }
 
 void ASoulWeapon::BeginPlay()
@@ -83,6 +89,10 @@ void ASoulWeapon::EquipItem()
 		}
 	}
 
+	// 전투 상태에 따라 소켓을 달리 적용
+	const FName AttachSocket = CombatComponent->IsCombatEnabled() ? EquipSocketName : UnequipSocketName;
+	AttachToOwner(AttachSocket);
+
 	// 컴뱃 컴포넌트에 무기를 알려주고 기존에 무기를 장착하고 있다면 교체
 	CombatComponent->SetWeapon(this);
 
@@ -90,11 +100,17 @@ void ASoulWeapon::EquipItem()
 	WeaponCollisionComponent->SetWeaponMesh(MeshComponent);
 	
 	// 무기 소유자는 충돌 체크에서 제외
-	WeaponCollisionComponent->AddIgnoredActor(GetOwner()); 
+	WeaponCollisionComponent->AddIgnoredActor(GetOwner());
 
-	// 전투 상태에 따라 소켓을 달리 적용
-	const FName AttachSocket = CombatComponent->IsCombatEnabled() ? EquipSocketName : UnequipSocketName;
-	AttachToOwner(AttachSocket);
+	// 장착한 무기의 CombatType으로 업데이트
+	if (const ASoulCharacterBase* SoulCharacter = Cast<ASoulCharacterBase>(GetOwner()))
+	{
+		if (USoulAnimInstance* AnimInstance = Cast<USoulAnimInstance>(SoulCharacter->GetMesh()->GetAnimInstance()))
+		{
+			AnimInstance->UpdateCombatMode(CombatType);
+		}
+	}
+
 }
 
 void ASoulWeapon::UnequipItem()
@@ -129,9 +145,27 @@ UAnimMontage* ASoulWeapon::GetMontageForTag(const FGameplayTag& InTag, const int
 
 void ASoulWeapon::ActivateCollision(EWeaponCollisionType InCollisionType)
 {
+	switch (InCollisionType)
+	{
+	case EWeaponCollisionType::MainCollision:
+		WeaponCollisionComponent->TurnOnCollision();
+		break;
+	case EWeaponCollisionType::SecondCollision:
+		SecondWeaponCollisionComponent->TurnOnCollision();
+		break;
+	}
 }
 
 void ASoulWeapon::DeactivateCollision(EWeaponCollisionType InCollisionType)
 {
+	switch (InCollisionType)
+	{
+	case EWeaponCollisionType::MainCollision:
+		WeaponCollisionComponent->TurnOffCollision();
+		break;
+	case EWeaponCollisionType::SecondCollision:
+		SecondWeaponCollisionComponent->TurnOffCollision();
+		break;
+	}
 }
 

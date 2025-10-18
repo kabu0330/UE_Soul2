@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Animation/AnimInstance.h"
+#include "Soul/SoulDefine.h"
 #include "SoulAnimInstance.generated.h"
 
 class UCharacterMovementComponent;
@@ -23,6 +24,12 @@ public:
 	// 앞에 AnimNotify_ 를 명시하면 뒤의 노티파이 이름과 동일한 일반 노티파이 생성하면 해당 시점에 함수 콜백
 	UFUNCTION()
 	void AnimNotify_ResetMovementInput();
+
+	void UpdateCombatMode(const ECombatType NewCombatType);
+
+protected:
+	// Delegate Binding Function
+	void OnChangedCombat(const bool bInCombatEnabled);
 
 
 protected:
@@ -46,6 +53,10 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MovementData")
 	bool bIsFalling;
-	
-	
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CombatData")
+	bool bCombatEnabled = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CombatData")
+	ECombatType CombatType = ECombatType::None;
 };

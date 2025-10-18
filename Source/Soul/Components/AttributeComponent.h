@@ -29,7 +29,7 @@ protected:
 	float MaxStamina = 100.f;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Attribute|Stamina")
-	float StaminaRate = 0.2f;
+	float StaminaRate = 2.2f;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Attribute|Stamina")
 	float StaminaRegenRate = 0.1f;

@@ -6,6 +6,7 @@
 #include "KismetAnimationLibrary.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Soul/Character/SoulCharacterBase.h"
+#include "Soul/Components/CombatComponent.h"
 #include "Soul/Components/StateComponent.h"
 
 USoulAnimInstance::USoulAnimInstance()
@@ -20,6 +21,14 @@ void USoulAnimInstance::NativeInitializeAnimation()
 	if (Character)
 	{
 		MovementComponent = Character->GetCharacterMovement();
+	}
+	
+	if (const ASoulCharacterBase* SoulCharacter = Cast<ASoulCharacterBase>(GetOwningActor()))
+	{
+		if (UCombatComponent* CombatComp = SoulCharacter->GetCombatComponent())
+		{
+			CombatComp->OnChangedCombat.AddUObject(this, &ThisClass::OnChangedCombat);
+		}
 	}
 }
 
@@ -48,4 +57,17 @@ void USoulAnimInstance::AnimNotify_ResetMovementInput()
 		SoulCharacter->GetStateComponent()->ToggleMovementInput(true);
 	}
 }
+
+void USoulAnimInstance::OnChangedCombat(const bool bInCombatEnabled)
+{
+	bCombatEnabled = bInCombatEnabled;
+}
+
+void USoulAnimInstance::UpdateCombatMode(ECombatType NewCombatType)
+{
+	// Weapon에서 무기를 습득할 때 호출
+	CombatType = NewCombatType;
+}
+
+
 

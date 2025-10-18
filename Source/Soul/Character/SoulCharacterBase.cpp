@@ -21,6 +21,7 @@ ASoulCharacterBase::ASoulCharacterBase(const FObjectInitializer& ObjectInitializ
 	StateComponent = CreateDefaultSubobject<UStateComponent>("StateComponent");
 	CombatComponent = CreateDefaultSubobject<UCombatComponent>("CombatComponent");
 
+
 	AttributeComponent->OnDeath.AddUObject(this, &ThisClass::OnDeath);
 
 }
@@ -44,6 +45,11 @@ void ASoulCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 bool ASoulCharacterBase::GetCurrentState(const FGameplayTag& InTag) const
 {
 	return StateComponent->IsActiveGameplayTag(InTag);
+}
+
+bool ASoulCharacterBase::GetCurrentState(const FGameplayTagContainer& InTag) const
+{
+	return StateComponent->IsAnyActiveGameplayTags(InTag);
 }
 
 FGameplayTag ASoulCharacterBase::GetAttackPerform() const
@@ -75,7 +81,7 @@ bool ASoulCharacterBase::CanPerformAttack(const FGameplayTag& AttackTypeTag) con
 	FGameplayTagContainer CheckTags;
 	CheckTags.AddTag(SoulGameplayTag::Character_State_Rolling);
 
-	// 여기서 공격 상태 체크를 예외로 예야 콤보 중 공격 입력이 들어올 때 즉시 다음 콤보가 동작할 수 있다.
+	// 여기서 공격 상태 체크를 예외로 해야 콤보 중 공격 입력이 들어올 때 즉시 다음 콤보가 동작할 수 있다.
 	//CheckTags.AddTag(SoulGameplayTag::Character_State_Attacking);
 
 	const float StaminaCost = CombatComponent->GetMainWeapon()->GetStaminaCost(AttackTypeTag);
@@ -113,7 +119,8 @@ void ASoulCharacterBase::DoAttack(const FGameplayTag& AttackTypeTag)
 			ComboCounter = CombatComponent->GetComboCounter();
 			Montage = Weapon->GetMontageForTag(AttackTypeTag, ComboCounter);
 		}
-
+		
+		MotionWarpingMouseCursor();
 		PlayAnimMontage(Montage);
 
 		const float StaminaCost = Weapon->GetStaminaCost(AttackTypeTag);
@@ -148,4 +155,5 @@ void ASoulCharacterBase::OnDeath()
 		MeshComp->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
 	}
 }
+
 

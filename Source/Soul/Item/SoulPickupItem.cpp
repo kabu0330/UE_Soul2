@@ -64,3 +64,8 @@ void ASoulPickupItem::Interact(AActor* InteractActor)
 	}
 }
 
+void ASoulPickupItem::InitSpawn()
+{
+	MeshComponent->SetSimulatePhysics(true); // 공중에 떠 있지 않고 바닥에 떨어뜨리기
+}
+

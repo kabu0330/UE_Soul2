@@ -7,6 +7,7 @@
 #include "Components/ActorComponent.h"
 #include "CombatComponent.generated.h"
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnChangedCombat, bool);
 
 class ASoulWeapon;
 
@@ -19,6 +20,10 @@ class SOUL_API UCombatComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
+public:
+	/** 무기 장착 모션 상태 변화를 알리는 델리게이트 */
+	FOnChangedCombat OnChangedCombat;
+	
 protected:
 	UPROPERTY()
 	TObjectPtr<ASoulWeapon> MainWeapon;
@@ -68,7 +73,8 @@ public:
 
 	// 전투 모드 
 	FORCEINLINE bool IsCombatEnabled() const { return bCombatEnabled; }
-	FORCEINLINE void SetCombatEnabled(const bool bEnabled) { bCombatEnabled = bEnabled; }
+	void SetCombatEnabled(const bool bEnabled);
+	
 
 	// Combo Section 
 	FORCEINLINE FGameplayTag GetLastAttackType() const {return LastAttackType;}
